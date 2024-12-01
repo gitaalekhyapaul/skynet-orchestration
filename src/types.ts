@@ -27,14 +27,43 @@ export type OktoJWTAuthResponse = {
 };
 
 export type OktoCreateWalletResponse = {
-    status: 'success' | 'failure';
-    data: {
-        wallets: {
-            network_name: string;
-            address: string;
-            success: boolean;
-        }[];
-    };
+  status: "success" | "failure";
+  data: {
+    wallets: {
+      network_name: string;
+      address: string;
+      success: boolean;
+    }[];
+  };
 };
 
 export type OktoResponse<T> = [AnyType, AxiosResponse<T>];
+
+export type OktoExecuteTxRequest = {
+  network_name: "POLYGON_TESTNET_AMOY";
+  transaction: {
+    from: string;
+    to: string;
+    data: string;
+    value: string;
+  };
+};
+
+export type OktoExecuteTxResponse = {
+  status: "success" | "failure";
+  data: {
+    orderId: string;
+  };
+};
+
+export type OktoExecuteTxStatusResponse = {
+  status: "success" | "failure";
+  data: {
+    jobs: {
+      order_id: string;
+      network_name: string;
+      status: "RUNNING" | "PUBLISHED" | "FAILURE";
+      transaction_hash: string;
+    }[];
+  };
+};
