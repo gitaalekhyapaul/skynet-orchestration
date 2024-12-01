@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { BaseService } from "./services/base.service.js";
 import { NgrokService } from "./services/ngrok.service.js";
 import oktoRoutes from "./routes/okto.routes.js";
+import walletRoutes from "./routes/wallet.routes.js";
 import HttpError from "http-errors";
 import { AnyType } from "./types.js";
 
@@ -14,6 +15,7 @@ const app: Express = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/v1/jwt", oktoRoutes);
+app.use("/api/v1/wallet", walletRoutes);
 
 app.get("/health-check", (req: Request, res: Response) => {
   res.status(200).json({ message: "OK", timestamp: new Date().toISOString() });

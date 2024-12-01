@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { AnyType, TelegramBotResponse } from "../types.js";
 import HttpError from "http-errors";
 
-export const telegramMiddleware: Handler = async (
+export const verifyBotMiddleware: Handler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -14,6 +14,7 @@ export const telegramMiddleware: Handler = async (
     return;
   }
   try {
+    console.log("Authenticating the bot token with Telegram API...");
     const { data } = await axios.get<
       AnyType,
       AxiosResponse<TelegramBotResponse>
@@ -22,6 +23,7 @@ export const telegramMiddleware: Handler = async (
       next(new HttpError.BadRequest("Unable to authorize from Telegram API"));
       return;
     }
+    console.dir(data, { depth: null });
     const { id, username } = data.result;
     res.locals.botInfo = {
       id: id,
@@ -31,5 +33,4 @@ export const telegramMiddleware: Handler = async (
   } catch (err) {
     next(new HttpError.BadRequest("Unauthorized: Unknown Error"));
   }
-  next();
 };

@@ -13,3 +13,13 @@ export type TelegramBotResponse = {
     has_main_web_app: boolean;
   };
 };
+
+export type OktoJWTAuthResponse = {
+  status: "success" | "failure";
+  data: {
+    auth_token: string;
+    message: string;
+    refresh_auth_token: string;
+    device_token: string;
+  };
+};
