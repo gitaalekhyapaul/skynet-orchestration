@@ -1,3 +1,5 @@
+import { AxiosResponse } from "axios";
+
 export type AnyType = any;
 export type TelegramBotResponse = {
   ok: boolean;
@@ -23,3 +25,16 @@ export type OktoJWTAuthResponse = {
     device_token: string;
   };
 };
+
+export type OktoCreateWalletResponse = {
+    status: 'success' | 'failure';
+    data: {
+        wallets: {
+            network_name: string;
+            address: string;
+            success: boolean;
+        }[];
+    };
+};
+
+export type OktoResponse<T> = [AnyType, AxiosResponse<T>];
