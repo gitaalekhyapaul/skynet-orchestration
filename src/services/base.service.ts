@@ -1,4 +1,4 @@
-import { AnyType } from "../types";
+import { AnyType } from "../types.js";
 
 export abstract class BaseService {
   private static instance: BaseService;

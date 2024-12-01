@@ -1,4 +1,4 @@
-import { BaseService } from "./base.service";
+import { BaseService } from "./base.service.js";
 import { forward, Listener } from "@ngrok/ngrok";
 
 export class NgrokService extends BaseService {
@@ -9,6 +9,7 @@ export class NgrokService extends BaseService {
   }
   async start() {
     await super.start();
+    console.log("Starting NGROK service...");
     this.listener = await forward({
       proto: "http",
       addr: process.env.PORT,
