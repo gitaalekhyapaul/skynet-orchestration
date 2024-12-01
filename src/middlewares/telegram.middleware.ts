@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, Handler } from "express";
 import axios, { AxiosResponse } from "axios";
 import { AnyType, TelegramBotResponse } from "../types.js";
-import HttpErrors from "http-errors";
+import HttpError from "http-errors";
 
 export const telegramMiddleware: Handler = async (
   req: Request,
@@ -9,9 +9,9 @@ export const telegramMiddleware: Handler = async (
   next: NextFunction
 ) => {
   const tgBotToken = req.get("X-TG-BOT-TOKEN");
-  console.log("Testing bot token in middleware: %s", tgBotToken);
   if (!tgBotToken) {
-    next(new HttpErrors.BadRequest("Unauthorized"));
+    next(new HttpError.BadRequest("Please provide TG bot token"));
+    return;
   }
   try {
     const { data } = await axios.get<
@@ -19,7 +19,8 @@ export const telegramMiddleware: Handler = async (
       AxiosResponse<TelegramBotResponse>
     >(`https://api.telegram.org/bot${tgBotToken}/getMe`);
     if (!data.ok) {
-      next(new HttpErrors.BadRequest("Unauthorized"));
+      next(new HttpError.BadRequest("Unable to authorize from Telegram API"));
+      return;
     }
     const { id, username } = data.result;
     res.locals.botInfo = {
@@ -28,7 +29,7 @@ export const telegramMiddleware: Handler = async (
     };
     next();
   } catch (err) {
-    next(new HttpErrors.BadRequest("Unauthorized"));
+    next(new HttpError.BadRequest("Unauthorized: Unknown Error"));
   }
   next();
 };

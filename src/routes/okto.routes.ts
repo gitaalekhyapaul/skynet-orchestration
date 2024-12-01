@@ -24,16 +24,21 @@ const handleGetJWT = async (req: Request, res: Response) => {
 };
 
 const handleVerifyJWT = async (req: Request, res: Response) => {
-  const token = req.get("Authorization");
+  let token = req.get("Authorization");
   if (token == null) {
     res.status(403).json({
-      message: "Please pass JWT in headers",
+      message: "Please pass JWT in Authorization header",
     });
     return;
   }
-  const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+  token = token.replace(/^Bearer\s/, "");
+  const decoded: jwt.JwtPayload = jwt.verify(
+    token,
+    process.env.JWT_SECRET!
+  ) as jwt.JwtPayload;
   res.status(200).json({
-    decoded,
+    user_id: String(decoded.user_id),
+    success: true,
   });
 };
 
