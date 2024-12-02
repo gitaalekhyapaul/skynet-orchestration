@@ -103,7 +103,13 @@ const handleExecuteTx = async (req: Request, res: Response) => {
     );
     res.status(200).json(data);
   } catch (err) {
-    res.status(500).json({ message: "Error executing transaction" });
+    console.error("Error executing transaction: %O", err);
+    if (isAxiosError(err)) {
+      console.error("Axios error: %O", err.response?.data);
+      res.status(err.response?.status || 500).json(err.response?.data);
+    } else {
+      res.status(500).json({ message: "Error executing transaction" });
+    }
     return;
   }
 };
