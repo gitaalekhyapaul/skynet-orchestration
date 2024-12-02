@@ -50,15 +50,29 @@ const handleExecuteTx = async (req: Request, res: Response) => {
   console.log("Executing transaction...");
   console.dir(req.body, { depth: null });
   const { network_name, transaction } = req.body as OktoExecuteTxRequest;
-  if (network_name !== "POLYGON_TESTNET_AMOY") {
+
+  // Validate based on network
+  if (network_name === "POLYGON_TESTNET_AMOY") {
+    const { from, to, data, value } = transaction;
+    if (!from || !to || !data || !value) {
+      res.status(400).json({ message: "Invalid transaction data" });
+      return;
+    }
+  } else if (network_name === "APTOS_TESTNET") {
+    const { transactions } = transaction;
+    if (
+      !transactions?.length ||
+      !transactions[0].function ||
+      !transactions[0].functionArguments
+    ) {
+      res.status(400).json({ message: "Invalid Aptos transaction data" });
+      return;
+    }
+  } else {
     res.status(400).json({ message: "Invalid network name" });
     return;
   }
-  const { from, to, data, value } = transaction;
-  if (!from || !to || !data || !value) {
-    res.status(400).json({ message: "Invalid transaction data" });
-    return;
-  }
+
   try {
     const { id } = res.locals.botInfo!;
     const auth_token = await botAuthTokenFromOkto(id);
@@ -71,8 +85,10 @@ const handleExecuteTx = async (req: Request, res: Response) => {
         },
       }
     );
+
     console.log("Transaction executed on Okto:");
     console.dir(data_2, { depth: null });
+
     const { orderId } = data_2.data;
     const data = await retryWithBackoff<
       OktoExecuteTxStatusResponse["data"]["jobs"][0]
@@ -96,8 +112,14 @@ const handleExecuteTx = async (req: Request, res: Response) => {
         maxRetries: 10,
         shouldRetry: (err, data) => {
           if (err != null) return true; // retry if there's an error
-          if (!data || data.status !== "PUBLISHED") return true; // retry if no data or status not SUCCESS
-          return false; // don't retry if we have data and status is SUCCESS
+          if (
+            !data ||
+            //@ts-ignore
+            (data.status !== "PUBLISHED" && data.status !== "SUCCESS")
+          ) {
+            return true; // retry if no data or status not SUCCESS/PUBLISHED
+          }
+          return false; // don't retry if we have data and status is SUCCESS/PUBLISHED
         },
       }
     );

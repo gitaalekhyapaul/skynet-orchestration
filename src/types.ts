@@ -39,13 +39,28 @@ export type OktoCreateWalletResponse = {
 
 export type OktoResponse<T> = [AnyType, AxiosResponse<T>];
 
+export type Network = "POLYGON_TESTNET_AMOY" | "APTOS_TESTNET";
+
+export type AptosTransaction = {
+  function: string;
+  typeArguments: string[];
+  functionArguments: (string | number)[];
+};
+
 export type OktoExecuteTxRequest = {
-  network_name: "POLYGON_TESTNET_AMOY";
+  network_name: "POLYGON_TESTNET_AMOY" | "APTOS_TESTNET";
   transaction: {
-    from: string;
-    to: string;
-    data: string;
-    value: string;
+    // Polygon fields
+    from?: string;
+    to?: string;
+    data?: string;
+    value?: string;
+    // Aptos fields
+    transactions?: {
+      function: string;
+      typeArguments?: string[];
+      functionArguments: (string | number)[];
+    }[];
   };
 };
 
